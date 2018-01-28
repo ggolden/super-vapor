@@ -6,7 +6,7 @@
 
 import FluentProvider
 
-class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
+public class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     
     enum SuperModelError: Error {
         case problem
@@ -63,7 +63,7 @@ class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: CustomStringConvertible
-    var description: String {
+    public var description: String {
         var rv = ""
         for prop in props {
             switch prop {
@@ -97,7 +97,7 @@ class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: JSONSettable
-    func set(json: JSON) {
+    public func set(json: JSON) {
         do {
             for prop in props {
                 switch prop {
@@ -113,7 +113,7 @@ class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: JSONConvertible
-    func makeJSON() throws -> JSON {
+    public func makeJSON() throws -> JSON {
         var json = JSON()
         for prop in props {
             switch prop {
@@ -171,7 +171,7 @@ class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: JSONConvertible
-    required convenience init(json: JSON) throws {
+    required convenience public init(json: JSON) throws {
         self.init()
         set(json: json)
     }

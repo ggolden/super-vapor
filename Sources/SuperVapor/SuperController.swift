@@ -6,7 +6,7 @@
 
 import FluentProvider
 
-class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Updateable & JSONSettable>: ResourceRepresentable {
+public class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Updateable & JSONSettable>: ResourceRepresentable {
     // register in Routes/Routes.swift
 
     // GET /base
@@ -55,7 +55,7 @@ class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Up
     }
     
     // register the REST handlers
-    func makeResource() -> Resource<Base> {
+    public func makeResource() -> Resource<Base> {
         return Resource(
             index: index,
             store: store,
