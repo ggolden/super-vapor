@@ -6,7 +6,7 @@
 
 import FluentProvider
 
-public class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Updateable & JSONSettable>: ResourceRepresentable {
+open class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Updateable & JSONSettable>: ResourceRepresentable {
     // register in Routes/Routes.swift
 
     // GET /base

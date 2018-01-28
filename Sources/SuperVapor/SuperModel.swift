@@ -6,7 +6,7 @@
 
 import FluentProvider
 
-public class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
+open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     
     enum SuperModelError: Error {
         case problem
