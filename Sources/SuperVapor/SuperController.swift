@@ -1,9 +1,3 @@
-//
-//  SuperController.swift
-//
-//  glenn_golden@apple.com
-//
-
 import FluentProvider
 
 open class SuperController<Base: Model & JSONConvertible & ResponseRepresentable & Updateable & JSONSettable>: ResourceRepresentable {

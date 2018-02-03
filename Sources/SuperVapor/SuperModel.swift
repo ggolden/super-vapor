@@ -1,9 +1,3 @@
-//
-//  SuperModel.swift
-//
-//  glenn_golden@apple.com
-//
-
 import FluentProvider
 
 open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
