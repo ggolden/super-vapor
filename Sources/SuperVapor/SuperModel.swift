@@ -2,31 +2,31 @@ import FluentProvider
 
 open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     
-    enum SuperModelError: Error {
+    public enum SuperModelError: Error {
         case problem
     }
     
-    enum PropDef {
+    public enum PropDef {
         case int(name: String)
         case string(name: String)
         case foreignKey(key: ForeignKey)
     }
     
-    enum Prop {
+    public enum Prop {
         case int(name: String, getter: () -> Int, setter: (Int) -> ())
         case string(name: String, getter: () -> String, setter: (String) -> ())
         case foreignKey(name: String, getter:() -> Identifier?, setter:(Identifier?) -> ())
     }
     
-    static let ID_KEY = "id"
+    public static let ID_KEY = "id"
     
-    var props: [Prop] = []
+    public var props: [Prop] = []
     
     // MARK: Model (support)
     
-    let storage = Storage()
+    public let storage = Storage()
     
-    func set(row: Row) throws {
+    public func set(row: Row) throws {
         for prop in props {
             switch prop {
             case .int(let name, _, let setter):
@@ -39,7 +39,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
         }
     }
     
-    func makeRow() throws -> Row {
+    public func makeRow() throws -> Row {
         var row = Row()
         
         for prop in props {
@@ -74,7 +74,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: Preparation (support)
-    static func prepareDb(builder: Builder, propDefs: [PropDef]) {
+    public static func prepareDb(builder: Builder, propDefs: [PropDef]) {
         builder.id()
         
         for prop in propDefs {
@@ -124,7 +124,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: Updateable (support)
-    static func getUpdateableKeys<T: SuperModel>(propDefs: [PropDef]) -> [UpdateableKey<T>] {
+    public static func getUpdateableKeys<T: SuperModel>(propDefs: [PropDef]) -> [UpdateableKey<T>] {
         var keys: [UpdateableKey<T>] = []
         
         for (index, prop) in propDefs.enumerated() {
