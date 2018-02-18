@@ -1,37 +1,50 @@
+//
+//  SuperModel.swift
+//
+
+import Foundation
 import FluentProvider
 
-open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
+class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     
-    public enum SuperModelError: Error {
+    enum SuperModelError: Error {
         case problem
     }
     
-    public enum PropDef {
+    enum PropDef {
         case int(name: String)
         case string(name: String)
+        case double(name: String)
+        case date(name: String)
         case foreignKey(key: ForeignKey)
     }
     
-    public enum Prop {
+    enum Prop {
         case int(name: String, getter: () -> Int, setter: (Int) -> ())
         case string(name: String, getter: () -> String, setter: (String) -> ())
+        case double(name: String, getter: () -> Double, setter: (Double) -> ())
+        case date(name: String, getter: () -> Date, setter: (Date) -> ())
         case foreignKey(name: String, getter:() -> Identifier?, setter:(Identifier?) -> ())
     }
     
-    public static let ID_KEY = "id"
+    static let ID_KEY = "id"
     
-    public var props: [Prop] = []
+    var props: [Prop] = []
     
     // MARK: Model (support)
     
-    public let storage = Storage()
+    let storage = Storage()
     
-    public func set(row: Row) throws {
+    func set(row: Row) throws {
         for prop in props {
             switch prop {
             case .int(let name, _, let setter):
                 try setter(row.get(name))
             case .string(let name, _, let setter):
+                try setter(row.get(name))
+            case .double(let name, _, let setter):
+                try setter(row.get(name))
+            case .date(let name, _, let setter):
                 try setter(row.get(name))
             case .foreignKey(let name, _, let setter):
                 try setter(row.get(name))
@@ -39,7 +52,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
         }
     }
     
-    public func makeRow() throws -> Row {
+    func makeRow() throws -> Row {
         var row = Row()
         
         for prop in props {
@@ -47,6 +60,10 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
             case .int(let name, let getter, _):
                 try row.set(name, getter())
             case .string(let name, let getter, _):
+                try row.set(name, getter())
+            case .double(let name, let getter, _):
+                try row.set(name, getter())
+            case .date(let name, let getter, _):
                 try row.set(name, getter())
             case .foreignKey(let name, let getter, _):
                 try row.set(name, getter())
@@ -57,13 +74,17 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: CustomStringConvertible
-    public var description: String {
+    var description: String {
         var rv = ""
         for prop in props {
             switch prop {
             case .int(let name, let getter, _):
                 rv += "\(name): \(getter()) "
             case .string(let name, let getter, _):
+                rv += "\(name): \(getter()) "
+            case .double(let name, let getter, _):
+                rv += "\(name): \(getter()) "
+            case .date(let name, let getter, _):
                 rv += "\(name): \(getter()) "
             case .foreignKey(let name, let getter, _):
                 rv += "\(name): \(String(describing: getter()))"
@@ -74,7 +95,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: Preparation (support)
-    public static func prepareDb(builder: Builder, propDefs: [PropDef]) {
+    static func prepareDb(builder: Builder, propDefs: [PropDef]) {
         builder.id()
         
         for prop in propDefs {
@@ -83,6 +104,10 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
                 builder.int(name)
             case .string(let name):
                 builder.string(name)
+            case .double(let name):
+                builder.double(name)
+            case .date(let name):
+                builder.date(name)
             case .foreignKey(let key):
                 builder.int(key.field, optional: true)
                 builder.foreignKey(key)
@@ -91,29 +116,46 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: JSONSettable
-    public func set(json: JSON) {
-        do {
-            for prop in props {
-                switch prop {
-                case .int(let name, _, let setter):
+    func set(json: JSON) {
+        // any prop missing from the JSON is ignored
+        for prop in props {
+            switch prop {
+            case .int(let name, _, let setter):
+                do {
                     try setter(json.get(name))
-                case .string(let name, _, let setter):
+                } catch {}
+            case .string(let name, _, let setter):
+                do {
                     try setter(json.get(name))
-                case .foreignKey(let name, _, let setter):
+                } catch {}
+            case .double(let name, _, let setter):
+                do {
                     try setter(json.get(name))
-                }
+                } catch {}
+            case .date(let name, _, let setter):
+                do {
+                    try setter(json.get(name))
+                } catch {}
+            case .foreignKey(let name, _, let setter):
+                do {
+                    try setter(json.get(name))
+                } catch {}
             }
-        } catch {}
+        }
     }
     
     // MARK: JSONConvertible
-    public func makeJSON() throws -> JSON {
+    func makeJSON() throws -> JSON {
         var json = JSON()
         for prop in props {
             switch prop {
             case .int(let name, let getter, _):
                 try json.set(name, getter())
             case .string(let name, let getter, _):
+                try json.set(name, getter())
+            case .double(let name, let getter, _):
+                try json.set(name, getter())
+            case .date(let name, let getter, _):
                 try json.set(name, getter())
             case .foreignKey(let name, let getter, _):
                 try json.set(name, getter())
@@ -124,7 +166,7 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: Updateable (support)
-    public static func getUpdateableKeys<T: SuperModel>(propDefs: [PropDef]) -> [UpdateableKey<T>] {
+    static func getUpdateableKeys<T: SuperModel>(propDefs: [PropDef]) -> [UpdateableKey<T>] {
         var keys: [UpdateableKey<T>] = []
         
         for (index, prop) in propDefs.enumerated() {
@@ -149,6 +191,26 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
                         throw SuperModelError.problem
                     }
                 })
+            case .double(let name):
+                keys.append(UpdateableKey(name, Double.self) { curator, d in
+                    let prop = curator.props[index]
+                    switch prop {
+                    case .double(_, _, let setter):
+                        setter(d)
+                    default:
+                        throw SuperModelError.problem
+                    }
+                })
+            case .date(let name):
+                keys.append(UpdateableKey(name, Date.self) { curator, d in
+                    let prop = curator.props[index]
+                    switch prop {
+                    case .date(_, _, let setter):
+                        setter(d)
+                    default:
+                        throw SuperModelError.problem
+                    }
+                })
             case .foreignKey(let key):
                 keys.append(UpdateableKey(key.field, Identifier.self) { curator, s in
                     let prop = curator.props[index]
@@ -165,8 +227,9 @@ open class SuperModel: CustomStringConvertible, JSONSettable, JSONConvertible {
     }
     
     // MARK: JSONConvertible
-    required convenience public init(json: JSON) throws {
+    required convenience init(json: JSON) throws {
         self.init()
         set(json: json)
     }
 }
+

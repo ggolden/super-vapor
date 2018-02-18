@@ -1,3 +1,7 @@
+//
+//  JSONSettable.swift
+//
+
 import JSON
 
 public protocol JSONSettable {
